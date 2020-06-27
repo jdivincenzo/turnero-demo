@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <None Include="Areas\Propietarios\Views\Turnero\Detalle.cshtml" />
-    <None Include="Areas\Propietarios\Views\Home\index.cshtml" />
+    <Compile Include="Areas\Propietarios\Views\Home\index.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
