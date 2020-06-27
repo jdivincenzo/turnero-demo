@@ -1,0 +1,48 @@
+﻿@model Web.Areas.Clientes.Models.DetalleTurnoVM
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-6">
+                <h1>Turnero @Model.Concepto</h1>
+                <p>@Model.Direccion</p>
+
+                <div id="mapaTurnero" style="height:20vh"></div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <div class="row justify-content-center">
+                    <h1>Turno @Model.Numero</h1>
+                </div>
+                <div class="row justify-content-center">
+                    <h2>@Model.EsperaEstimadaMsg</h2>
+                </div>
+                <div class="row justify-content-center">
+                    <img class="img-fluid" src="data:image/jpeg;base64, @Model.Qr" alt="Codigo QR" />
+                </div>
+                <div class="row justify-content-center">
+                    <form asp-controller="CancelarTurno">
+                        <input name="idTurno" hidden value="@Model.IdTurno" />
+                        <input name="idTurnero" hidden value="@Model.IdTurnero" />
+                        <div class="col-sm-12">
+                            <div class="btn-toolbar justify-content-around align-items-center" role="toolbar" aria-label="Toolbar with button groups">
+                                <button class="btn btn-primary" type="submit" asp-controller="DemorarTurno" asp-action="DemorarTurno">Demorar turno</button>
+                                <button class="btn btn-danger" type="submit" asp-controller="CancelarTurno" asp-action="CancelarTurno">Cancelar turno</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://openlayers.org/api/OpenLayers.js"></script>
+<script>
+    var Model = @Html.Raw(Json.Serialize(Model));
+</script>
+<script src="@Url.Content("~/Scripts/turneroInMap.js")" type="text/javascript"></script>

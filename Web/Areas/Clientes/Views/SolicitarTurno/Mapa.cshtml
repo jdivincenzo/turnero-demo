@@ -1,0 +1,134 @@
+﻿@using Newtonsoft.Json
+@using Web.Areas.Clientes.Models
+@model List<ListarTurnerosVM>
+
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-8 col-sm-12">
+        <div id="buscarTurneroMap" style="height:50vh; margin: 1px"></div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+        <div id="buscarTurneroDataPanel" class="jumbotron d-flex flex-column" style="display:none!important; height: 50vh; margin: 1px">
+            <div class="h4 text-center" id="descripcionTurnero"></div>
+            <div class="h6 text-center" id="direccionTurnero"></div>
+            <div class="h6 text-center" id="esperaTurnero"></div>
+            <img class="rounded mx-auto d-block" style=" height: 100px ;width:100px; max-width: 100px;max-height: 100px;min-width: 100px;min-height: 100px;"  id="imgTurnero"/>
+            <br/>   
+            <a href="#" id="confirmarTurneroLink" class="btn btn-primary btn-block mt-auto" role="button">Pedir turno</a>
+        </div>
+        <div id="buscarTurneroDataPanelPlaceholder" class="jumbotron" style="height: 50vh; margin: 1px">
+            <div class="h2 text-center">
+                Elegí el local que buscás en el mapa o del listado!
+            </div>
+        </div>
+    </div>
+    <div class="col-12 table-responsive">
+        <table class="table table-striped table-hover table-sm" style="width:100%">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Direccion</th>
+                    <th scope="col" class="text-center">Gente en espera</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var turnero in Model)
+                {
+                    <tr>
+                        <td> @turnero.Concepto </td>
+                        <td> @turnero.Calle @turnero.Numero, @turnero.Ciudad</td>
+                        <td class="text-center"> @turnero.DisplayEspera </td>
+                        <td>
+                            @Html.ActionLink(
+                                "Pedir turno",
+                                "ConfirmarTurno",
+                                "SolicitarTurno",
+                                new { idTurnero = turnero.Id },
+                                null
+                            )
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+<script src="https://openlayers.org/api/OpenLayers.js"></script>
+
+<script>
+
+    var zoom = 12;
+    var latIni = -34.6302673;
+    var lonIni = -58.4356537;
+    var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+    var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+    var positionIni = new OpenLayers.LonLat(lonIni, latIni).transform(fromProjection, toProjection);
+
+    map = new OpenLayers.Map("buscarTurneroMap");
+    var mapnik = new OpenLayers.Layer.OSM();
+    map.addLayer(mapnik);
+
+    map.setCenter(positionIni, zoom);
+
+    var markers = new OpenLayers.Layer.Markers("Markers");
+    map.addLayer(markers);
+
+    var buildAddress = (idTurnero) => `@Url.Link("Default", new { Area = "Clientes",  Controller = "SolicitarTurno", Action = "ConfirmarTurno"})/?idTurnero=${idTurnero}`
+    var turneros = @Html.Raw(@JsonConvert.SerializeObject(Model))
+
+
+
+        function cargar(id, concepto, direccion, lat, lon, displayEspera, path) {
+        var position = new OpenLayers.LonLat(lon, lat).transform(fromProjection, toProjection);
+
+        var marker = new OpenLayers.Marker(position);
+        marker.id = id;
+        marker.icon.imageDiv.title = concepto;
+
+        marker.events.register("click", marker, function () {
+            console.log(`Click en  turnero ${id}: ${concepto}`)
+            $("#descripcionTurnero").text(concepto);
+            $("#direccionTurnero").text(direccion);
+            $("#esperaTurnero").text(`Gente en espera: ${displayEspera}`);
+            if (path)
+            {
+                $("#imgTurnero").show();
+                $("#imgTurnero")[0].src = "../../img/" + path;
+            }
+            else
+                $("#imgTurnero").hide();
+            $("#idTurnero").val(id);
+
+
+            $("#confirmarTurneroLink").attr("href", buildAddress(id) );
+
+            $("#buscarTurneroDataPanel").show();
+            $("#buscarTurneroDataPanelPlaceholder").hide();
+        });
+        markers.addMarker(marker);
+        }
+
+    for (var turnero of turneros) {
+        var direccion = `${turnero.Calle} ${turnero.Numero} ${turnero.Ciudad}`;
+        var path;
+        if (turnero.Files && turnero.Files.length > 0)
+            path = turnero.Files[0];
+        else
+            path = null;
+        cargar(turnero.Id, turnero.Concepto, direccion, turnero.Ubicacion.Latitud, turnero.Ubicacion.Longitud, turnero.DisplayEspera, path);
+    }
+</script>
+@*@foreach (var turnero in Model)
+    {
+        <script> cargar(@turnero.Id, "@turnero.Concepto", parseFloat("@turnero.Ubicacion.Latitud".replace(',', '.')), parseFloat("@turnero.Ubicacion.Longitud".replace(',', '.')))</script>
+    }*@
