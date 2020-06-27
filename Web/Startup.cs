@@ -75,17 +75,17 @@ namespace Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days.You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage();
+            //    app.UseDatabaseErrorPage();
+            //}
+            //else
+            //{
+            //    //app.UseExceptionHandler("/Home/Error");
+            //    // The default HSTS value is 30 days.You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            //    app.UseHsts();
+            //}
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -105,10 +105,10 @@ namespace Web
                     name: "AreaPropietarios",
                     areaName: "Propietarios",
                     pattern: "Propietarios/{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapControllerRoute(
-                    name: "errorHandling",
-                    pattern: "Home/Error/{id?}",
-                    defaults: new {  controller = "Home", action = "Error" });
+                //endpoints.MapControllerRoute(
+                //    name: "errorHandling",
+                //    pattern: "Home/Error/{id?}",
+                //    defaults: new {  controller = "Home", action = "Error" });
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}",
